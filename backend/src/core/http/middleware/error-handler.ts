@@ -4,6 +4,8 @@ import { response } from "../response.js";
 import { ValidationError } from "../../errors/ValidationError.js";
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, cb) => {
+	console.error(err);
+
 	if (err instanceof ValidationError) {
 		return response.error(
 			res,
@@ -22,8 +24,6 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, cb) => {
 			err.code,
 		);
 	}
-
-	console.error(err);
 
 	return response.error(res, "Internal server error!", 500);
 };
