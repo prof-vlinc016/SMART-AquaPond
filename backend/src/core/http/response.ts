@@ -24,15 +24,15 @@ export const response = {
 	error(
 		res: Response,
 		message = "Request failed",
-		details: string[] | null,
 		statusCode = 400,
 		code = "REQUEST_ERROR",
+		details?: string[],
 	) {
 		return res.status(statusCode).json({
 			success: false,
 			message,
-			details,
 			code,
+			details,
 		});
 	},
 
