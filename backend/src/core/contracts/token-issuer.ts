@@ -1,5 +1,3 @@
-// token-issuer.ts
-
 import { TokenPayload } from "../types/token-payload.js";
 
 export interface TokenIssuer {
