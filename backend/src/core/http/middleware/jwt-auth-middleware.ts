@@ -8,7 +8,7 @@ export function createAuthMiddleware(tokenVerifier: TokenVerifier) {
             const authHeader = req.headers.authorization;
 
             if (!authHeader?.includes("Bearer ")) {
-                throw new UnAuthorizedError();
+                throw new UnAuthorizedError("Invalid or missing token!");
             }
 
             const token = authHeader.substring(7);
