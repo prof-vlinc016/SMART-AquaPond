@@ -4,10 +4,16 @@ import { response } from "../response.js";
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, cb) => {
 	if (err instanceof AppError) {
-		return response.error(res, err.message, err.statusCode, err.code);
+		return response.error(
+			res,
+			err.message,
+			err.details,
+			err.statusCode,
+			err.code,
+		);
 	}
 
 	console.error(err);
 
-	return response.error(res, "Internal server error!", 500);
+	return response.error(res, "Internal server error!", null, 500);
 };
