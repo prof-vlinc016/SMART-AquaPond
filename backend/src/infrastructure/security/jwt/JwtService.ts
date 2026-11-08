@@ -8,25 +8,29 @@ import { UnAuthorizedError } from "../../../core/errors/UnAuthorizedError.js";
 
 export class JwtService implements TokenIssuer, TokenVerifier {
 	issue(payload: TokenPayload): string {
-        const secret = env.jwt.secret as Secret;
-        const options = {
-            expiresIn: env.jwt.expiresIn as SignOptions['expiresIn']
-        }
+		const secret = env.jwt.secret as Secret;
+		const options = {
+			expiresIn: env.jwt.expiresIn as SignOptions["expiresIn"],
+		};
 
-        if (!secret) {
-            throw new AppError("JWT_SECRET not defined!");
-        }
+		if (!secret) {
+			throw new AppError("JWT_SECRET not defined!");
+		}
 
-        return sign(payload, secret, options);
+		return sign(payload, secret, options);
 	}
 
 	verify(token: string): TokenPayload {
-        const secret = env.jwt.secret as Secret;
+		const secret = env.jwt.secret as Secret;
 
-        try {
-            return verify(token, secret) as TokenPayload;
-        } catch (error) {
-            throw new UnAuthorizedError("Invalid or missing token!");
-        }
-    }
+		if (!secret) {
+			throw new AppError("JWT_SECRET not defined!");
+		}
+
+		try {
+			return verify(token, secret) as TokenPayload;
+		} catch (error: unknown) {
+			throw new UnAuthorizedError("Invalid or missing token!");
+		}
+	}
 }
