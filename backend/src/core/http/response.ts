@@ -1,7 +1,7 @@
 import type { Response } from "express";
 
 export const response = {
-	success<T>(res: Response, data: T, message = "Request successful") {
+	success<T>(res: Response, message: string, data?: T) {
 		return res.status(200).json({
 			success: true,
 			message,
@@ -9,11 +9,7 @@ export const response = {
 		});
 	},
 
-	created<T>(
-		res: Response,
-		data: T,
-		message = "Resource created successfully",
-	) {
+	created<T>(res: Response, message: string, data?: T) {
 		return res.status(201).json({
 			success: true,
 			message,
@@ -23,9 +19,9 @@ export const response = {
 
 	error(
 		res: Response,
-		message = "Request failed",
-		statusCode = 400,
-		code = "REQUEST_ERROR",
+		message: string,
+		statusCode: number = 400,
+		code: string = "REQUEST_ERROR",
 		details?: string[],
 	) {
 		return res.status(statusCode).json({
