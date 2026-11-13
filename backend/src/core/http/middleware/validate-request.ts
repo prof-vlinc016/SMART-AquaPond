@@ -11,41 +11,47 @@ export const validateRequest = {
 
 			throw new ValidationError("Validation failed!", details);
 		}
+
+		return result.data;
 	},
 
-	params(schema: ZodType) {
+	params<T extends ZodType>(schema: T) {
 		return (req: Request, res: Response, next: NextFunction) => {
-			const result = schema.safeParse(req.params);
+			try {
+				req.params = this.evaluate(
+					schema.safeParse(req.params),
+				) as Request["params"];
 
-			this.evaluate(result);
-
-			req.params = result.data as Record<string, any>;
-
-			next();
+				next();
+			} catch (error: unknown) {
+				next(error);
+			}
 		};
 	},
 
-	body(schema: ZodType) {
+	body<T extends ZodType>(schema: T) {
 		return (req: Request, res: Response, next: NextFunction) => {
-			const result = schema.safeParse(req.body);
+			try {
+				req.body = this.evaluate(schema.safeParse(req.body));
 
-			this.evaluate(result);
-
-			req.body = result.data;
-
-			next();
+				next();
+			} catch (error: unknown) {
+				next(error);
+			}
 		};
 	},
 
-	query(schema: ZodType) {
+	query<T extends ZodType>(schema: T) {
 		return (req: Request, res: Response, next: NextFunction) => {
-			const result = schema.safeParse(req.query);
+			try {
+				req.query = this.evaluate(
+					schema.safeParse(req.query),
+				) as Request["query"];
 
-			this.evaluate(result);
-
-			req.query = result.data as Record<string, any>;
-
-			next();
+				next();
+			} catch (error: unknown) {
+				next(error);
+			}
 		};
 	},
 };
