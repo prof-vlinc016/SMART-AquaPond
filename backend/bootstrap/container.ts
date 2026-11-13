@@ -15,7 +15,11 @@ const userModule = new UserModule(database);
 
 export const container = {
 	pool: database.getPool(),
-	auth: authModule,
-    user: userModule,
-    tokenVerifier: jwtService
+	auth: {
+		router: authModule.getRouter(),
+		tokenVerifier: jwtService,
+	},
+	user: {
+		router: userModule.getRouter(),
+	},
 };

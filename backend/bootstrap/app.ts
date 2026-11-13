@@ -37,8 +37,8 @@ app.get("/api/health", (_req, res) => {
 	});
 });
 
-app.use("/api/auth", container.auth.getRouter());
-app.use("/api/user", container.user.getRouter());
+app.use("/api/auth", container.auth.router);
+app.use("/api/user", container.user.router);
 
 // Unknown routes
 app.use((_req, res) => {
