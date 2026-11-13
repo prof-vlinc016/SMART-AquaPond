@@ -6,7 +6,7 @@ import morgan from "morgan";
 import { errorHandler } from "../src/core/http/middleware/error-handler.js";
 import { env } from "../src/core/config/env.js";
 import { AppError } from "../src/core/errors/AppError.js";
-import authFactory from "../src/modules/auth/auth-factory.js";
+import { container } from "./container.js";
 
 const app = express();
 
@@ -37,7 +37,8 @@ app.get("/api/health", (_req, res) => {
 	});
 });
 
-app.use("/api/auth", authFactory);
+app.use("/api/auth", container.auth.getRouter());
+app.use("/api/user", container.user.getRouter());
 
 // Unknown routes
 app.use((_req, res) => {
