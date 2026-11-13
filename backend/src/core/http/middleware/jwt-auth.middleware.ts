@@ -17,7 +17,7 @@ export function createAuthMiddleware(tokenVerifier: TokenVerifier) {
             req.user = payload;
 
             next();
-        } catch (error) {
+        } catch (error: unknown) {
             next(error);
         }
     };
