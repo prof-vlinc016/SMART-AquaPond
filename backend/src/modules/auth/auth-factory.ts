@@ -4,10 +4,10 @@ import { BcryptPasswordHasher } from "../../infrastructure/security/hashing/Bcry
 import { Sha256RefreshTokenHasher } from "../../infrastructure/security/hashing/Sha256RefreshTokenHasher.js";
 import { JwtService } from "../../infrastructure/security/jwt/JwtService.js";
 import { AuthController } from "./controller/AuthController.js";
-import { MySqlAuthUserRepository } from "./repository/MySqlAuthUserRepository.js";
-import { MySqlRefreshTokenRepository } from "./repository/MysqlRefreshTokenRepository.js";
+import { MySqlAuthUserRepository } from "./repositories/MySqlAuthUserRepository.js";
+import { MySqlRefreshTokenRepository } from "./repositories/MysqlRefreshTokenRepository.js";
 import { AuthRouter } from "./routes/AuthRouter.js";
-import { RefreshTokenService } from "./service/RefreshTokenService.js";
+import { RefreshTokenService } from "./services/RefreshTokenService.js";
 import { AuthenticateUserUsecase } from "./usecases/AuthenticateUserUsecase.js";
 import { CreateUserUsecase } from "./usecases/CreateUserUsecase.js";
 import { RefreshSessionUsecase } from "./usecases/RefreshSessionUsecase.js";
