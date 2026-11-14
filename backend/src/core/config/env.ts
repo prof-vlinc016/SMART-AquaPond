@@ -3,7 +3,7 @@ import "dotenv/config";
 export const env = {
 	nodeEnv: process.env.NODE_ENV ?? "development",
 
-	clientOrigins: (process.env.CLIENT_ORIGINS ?? "http://localhost:5173")
+	clientOrigins: (process.env.CLIENT_ORIGINS ?? "http://127.0.0.1:5500")
 		.split(",")
 		.map((origin) => origin.trim())
 		.filter(Boolean),
