@@ -1,54 +1,53 @@
-import express from "express";
+import express, { Router, Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { errorHandler } from "../src/core/http/middleware/error-handler.js";
-import { env } from "../src/core/config/env.js";
+import { errorHandler } from "../src/core/http/middleware/error-handler.middleware.js";
 import { AppError } from "../src/core/errors/AppError.js";
-import { container } from "./container.js";
+import { notFoundHandler } from "../src/core/http/middleware/not-found.middleware.js";
 
-const app = express();
+interface AppDependency {
+	clientOrigins: string[];
+	authRouter: Router;
+	userRouter: Router;
+}
 
-app.use(helmet());
+export function createApp(dependencies: AppDependency) {
+	const app = express();
 
-app.use(
-	cors({
-		origin: (origin, callback) => {
-			if (!origin || env.clientOrigins.includes(origin)) {
-				return callback(null, true);
-			}
+	app.use(helmet());
 
-			return callback(new AppError("Origin not allowed by CORS"));
-		},
-		credentials: true,
-	}),
-);
+	app.use(
+		cors({
+			origin: (origin, callback) => {
+				if (!origin || dependencies.clientOrigins.includes(origin)) {
+					return callback(null, true);
+				}
 
-app.use(morgan("dev"));
-app.use(express.json({ limit: "5mb" }));
-app.use(cookieParser());
+				return callback(new AppError("Origin not allowed by CORS"));
+			},
+			credentials: true,
+		}),
+	);
 
-// Health check
-app.get("/api/health", (_req, res) => {
-	res.status(200).json({
-		success: true,
-		message: "AquaPond API is running",
+	app.use(morgan("dev"));
+	app.use(express.json({ limit: "5mb" }));
+	app.use(cookieParser());
+
+	// Health check
+	app.get("/api/health", (_req, res) => {
+		res.status(200).json({
+			success: true,
+			message: "AquaPond API is running",
+		});
 	});
-});
 
-app.use("/api/auth", container.auth.router);
-app.use("/api/user", container.user.router);
+	app.use("/api/auth", dependencies.authRouter);
+	app.use("/api/user", dependencies.userRouter);
 
-// Unknown routes
-app.use((_req, res) => {
-	res.status(404).json({
-		success: false,
-		message: "Route not found",
-	});
-});
+	app.use(notFoundHandler);
+	app.use(errorHandler);
 
-// Centralized error handling must be last
-app.use(errorHandler);
-
-export default app;
+	return app;
+}

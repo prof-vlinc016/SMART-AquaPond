@@ -1,25 +1,28 @@
-// bootstrap/container.ts
+import {
+	MySqlDatabase,
+	MySqlDatabaseConfig,
+} from "../src/infrastructure/database/mysql/MySqlDatabase.js";
+import {
+	JwtConfig,
+	JwtService,
+} from "../src/infrastructure/security/jwt/JwtService.js";
+import { SocketPresenceManager } from "../src/infrastructure/websocket/presence/SocketPresenceManager.js";
 
-import { MySqlDatabase } from "../src/infrastructure/database/mysql/MySqlDarabase.js";
-import { JwtService } from "../src/infrastructure/security/jwt/JwtService.js";
-import { AuthModule } from "../src/modules/auth/AuthModule.js";
-import { UserModule } from "../src/modules/user/UserModule.js";
+interface ContainerDependency {
+	persistenceConfig: MySqlDatabaseConfig;
+	jwtConfig: JwtConfig;
+}
 
-const database = new MySqlDatabase();
+export function createContainer(dependencies: ContainerDependency) {
+	const database = new MySqlDatabase(dependencies.persistenceConfig);
 
-const jwtService = new JwtService();
+	const jwtService = new JwtService(dependencies.jwtConfig);
 
-const authModule = new AuthModule(database, jwtService, jwtService);
+	const presenceManager = new SocketPresenceManager();
 
-const userModule = new UserModule(database);
-
-export const container = {
-	pool: database.getPool(),
-	auth: {
-		router: authModule.getRouter(),
-		tokenVerifier: jwtService,
-	},
-	user: {
-		router: userModule.getRouter(),
-	},
-};
+	return {
+		database,
+		jwtService,
+		presenceManager,
+	};
+}

@@ -1,20 +1,36 @@
-import { env } from "../src/core/config/env.js";
-import app from "./app.js";
+import { createServer } from "node:http";
+import { Express } from "express";
 
-async function startServer() {
-	try {
-		const appName = env.app.name;
-		const appPort = env.app.port;
-
-		app.listen(appPort, () => {
-			console.log(`${appName} running on port ${appPort}`);
-		});
-	} catch (error: unknown) {
-		if (error instanceof Error) {
-			console.error(error.message);
-			process.exit(1);
-		}
-	}
+interface ServerConfig {
+	name: string;
+	port: number;
 }
 
-startServer();
+export class Server {
+	readonly httpServer;
+	private app?: Express;
+	
+	constructor(private readonly config: ServerConfig) {
+		this.httpServer = createServer((req, res) => {
+			if (!this.app) {
+				res.statusCode = 503;
+				res.end("Application not ready");
+				return;
+			}
+
+			this.app(req, res);
+		});
+	}
+
+	attachApp(app: Express) {
+		this.app = app;
+	}
+
+	start() {
+		this.httpServer.listen(this.config.port, () => {
+			console.log(
+				`${this.config.name} running on port ${this.config.port}`,
+			);
+		});
+	}
+}
