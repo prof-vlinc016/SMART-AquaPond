@@ -1,34 +1,41 @@
 import { TokenIssuer } from "../../../core/contracts/token-issuer.js";
 import { TokenVerifier } from "../../../core/contracts/token-verifier.js";
 import { TokenPayload } from "../../../core/types/token-payload.js";
-import { env } from "../../../core/config/env.js";
 import { AppError } from "../../../core/errors/AppError.js";
 import jwt from "jsonwebtoken";
 import { UnAuthorizedError } from "../../../core/errors/UnAuthorizedError.js";
+import { StringValue } from "ms";
+
+export interface JwtConfig {
+	secret?: string;
+	expiresIn?: string;
+}
 
 export class JwtService implements TokenIssuer, TokenVerifier {
-	issue(payload: TokenPayload): string {
-		const secret = env.jwt.secret as jwt.Secret;
-		const options = {
-			expiresIn: env.jwt.expiresIn as jwt.SignOptions["expiresIn"],
-		};
+	private readonly secret: jwt.Secret;
+	private readonly expiresIn: jwt.SignOptions["expiresIn"];
 
-		if (!secret) {
-			throw new AppError("JWT_SECRET not defined!");
+	constructor(config: JwtConfig) {
+		if (!config.secret || !config.expiresIn) {
+			throw new AppError("JWT config not defined!");
 		}
+
+		this.secret = config.secret;
+		this.expiresIn = config.expiresIn as StringValue;
+	}
+
+	issue(payload: TokenPayload): string {
+		const secret = this.secret;
+		const options = {
+			expiresIn: this.expiresIn,
+		};
 
 		return jwt.sign(payload, secret, options);
 	}
 
 	verify(token: string): TokenPayload {
-		const secret = env.jwt.secret as jwt.Secret;
-
-		if (!secret) {
-			throw new AppError("JWT_SECRET not defined!");
-		}
-
 		try {
-			return jwt.verify(token, secret) as TokenPayload;
+			return jwt.verify(token, this.secret) as TokenPayload; 
 		} catch (error: unknown) {
 			throw new UnAuthorizedError("Invalid or missing token!");
 		}
