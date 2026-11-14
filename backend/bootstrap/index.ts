@@ -3,6 +3,7 @@ import { createSocketServer } from "../src/infrastructure/websocket/socket-serve
 import { createApp } from "./app.js";
 import { createContainer } from "./container.js";
 import { createModules } from "./modules.js";
+import { createAppRouter } from "./router.js";
 import { Server } from "./Server.js";
 
 const server = new Server({
@@ -38,10 +39,14 @@ const modules = createModules({
 	io: socketServer,
 });
 
+const appRouter = createAppRouter({
+	authModule: modules.authModule,
+	userModule: modules.userModule,
+});
+
 const app = createApp({
 	clientOrigins: env.clientOrigins,
-	authRouter: modules.authModule.getRouter(),
-	userRouter: modules.userModule.getRouter(),
+	appRouter: appRouter,
 });
 
 server.attachApp(app);

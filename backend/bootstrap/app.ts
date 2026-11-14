@@ -9,8 +9,7 @@ import { notFoundHandler } from "../src/core/http/middleware/not-found.middlewar
 
 interface AppDependency {
 	clientOrigins: string[];
-	authRouter: Router;
-	userRouter: Router;
+	appRouter: Router;
 }
 
 export function createApp(dependencies: AppDependency) {
@@ -43,9 +42,7 @@ export function createApp(dependencies: AppDependency) {
 		});
 	});
 
-	app.use("/api/auth", dependencies.authRouter);
-	app.use("/api/user", dependencies.userRouter);
-
+	app.use("/api", dependencies.appRouter);
 	app.use(notFoundHandler);
 	app.use(errorHandler);
 
