@@ -5,6 +5,7 @@ import ms, { StringValue } from "ms";
 import { env } from "../../../core/config/env.js";
 import { RefreshSessionUsecase } from "../usecases/RefreshSessionUsecase.js";
 import { RevokeSessionUsecase } from "../usecases/RevokeSessionUsecase.js";
+import { AuthenticateUserInput } from "../dtos/authenticate-user-dto.js";
 
 export class AuthController {
 	constructor(
@@ -14,7 +15,9 @@ export class AuthController {
 	) {}
 
 	async loginUser(req: Request, res: Response) {
-		const authResult = await this.authenticateUserUsecase.execute(req.body);
+		const authUserInput = req.validatedBody as AuthenticateUserInput
+
+		const authResult = await this.authenticateUserUsecase.execute(authUserInput);
 
 		this.attachRefreshCookie(res, authResult.refreshToken);
 
