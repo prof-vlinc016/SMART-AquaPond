@@ -5,11 +5,16 @@ import { UpdateUserProfileUsecase } from "../usecases/UpdateUserProfileUsecase.j
 import { UserParams } from "../schema/user-params.shema.js";
 import { response } from "../../../core/http/response.js";
 import { UpdateUser } from "../schema/update-user.schema.js";
+import { TokenPayload } from "../../../core/types/token-payload.js";
+import { ImageFile } from "../../../core/types/image-file.js";
+import { CreateUser } from "../schema/create-user.schema.js";
+import { CreateUserUsecase } from "../usecases/CreateUserUsecase.js";
 
 export class UserController {
 	constructor(
 		private readonly getUserListUsecase: GetUserListUsecase,
 		private readonly getUserUsecase: GetUserUsecase,
+		private readonly createUserUsecase: CreateUserUsecase,
 		private readonly updateUserProfileUsecase: UpdateUserProfileUsecase,
 	) {}
 
@@ -27,15 +32,32 @@ export class UserController {
 		return response.success(res, "User fetched successful!", user);
 	}
 
+	async createUser(req: Request, res: Response) {
+		const createUserInput = req.body as CreateUser;
+
+		const imageFile = req.file as ImageFile | undefined;
+
+		await this.createUserUsecase.execute({
+			...createUserInput,
+			profileImage: imageFile ?? null,
+		});
+
+		return response.created(res, "User created successful!");
+	}
+
 	async updateUserProfile(req: Request, res: Response) {
-		const { id } = req.params as unknown as UserParams;
+		const { id } = req.user as TokenPayload;
+
 		const updateUserInput = req.body as UpdateUser;
+
+		const imageFile = req.file as ImageFile | undefined;
 
 		const user = await this.updateUserProfileUsecase.execute({
 			id,
 			...updateUserInput,
+			profileImage: imageFile ?? null,
 		});
 
-		return response.success(res, "User updated successful!", user);
+		return response.success(res, "User updated successful!");
 	}
 }
