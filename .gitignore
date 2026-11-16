@@ -6,3 +6,6 @@ backend/.env
 
 # Build output
 dist/
+
+# Local file storage
+uploads/
