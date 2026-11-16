@@ -8,6 +8,7 @@ import { requireAuth } from "../../../core/http/middleware/jwt-auth.middleware.j
 import { requireRole } from "../../../core/http/middleware/role.middleware.js";
 import { upload } from "../../../core/http/middleware/upload.middleware.js";
 import { createUserSchema } from "../schema/create-user.schema.js";
+import { userQuerySchema } from "../schema/get-user.schema.js";
 
 export class UserRouter {
 	private router = Router();
@@ -26,6 +27,7 @@ export class UserRouter {
 			"/",
 			requireAuth(this.tokenVerifier),
 			requireRole("ADMIN"),
+			validateRequest.query(userQuerySchema),
 			uc.getUserList.bind(uc),
 		);
 
