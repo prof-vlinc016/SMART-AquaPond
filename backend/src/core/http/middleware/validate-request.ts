@@ -18,7 +18,7 @@ export const validateRequest = {
 	params<T extends ZodType>(schema: T) {
 		return (req: Request, res: Response, next: NextFunction) => {
 			try {
-				req.params = this.evaluate(
+				req.validatedParams = this.evaluate(
 					schema.safeParse(req.params),
 				) as Request["params"];
 
@@ -32,7 +32,7 @@ export const validateRequest = {
 	body<T extends ZodType>(schema: T) {
 		return (req: Request, res: Response, next: NextFunction) => {
 			try {
-				req.body = this.evaluate(schema.safeParse(req.body));
+				req.validatedBody = this.evaluate(schema.safeParse(req.body));
 
 				next();
 			} catch (error: unknown) {
@@ -44,7 +44,7 @@ export const validateRequest = {
 	query<T extends ZodType>(schema: T) {
 		return (req: Request, res: Response, next: NextFunction) => {
 			try {
-				req.query = this.evaluate(
+				req.validatedQuery = this.evaluate(
 					schema.safeParse(req.query),
 				) as Request["query"];
 
