@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { CreateUserUsecase } from "../usecases/CreateUserUsecase.js";
 import { response } from "../../../core/http/response.js";
 import { AuthenticateUserUsecase } from "../usecases/AuthenticateUserUsecase.js";
 import ms, { StringValue } from "ms";
@@ -9,17 +8,10 @@ import { RevokeSessionUsecase } from "../usecases/RevokeSessionUsecase.js";
 
 export class AuthController {
 	constructor(
-		private readonly createUserUsecase: CreateUserUsecase,
 		private readonly authenticateUserUsecase: AuthenticateUserUsecase,
 		private readonly refreshSessionUsecase: RefreshSessionUsecase,
 		private readonly revokeSessionUsecase: RevokeSessionUsecase,
 	) {}
-
-	async registerUser(req: Request, res: Response) {
-		const id = await this.createUserUsecase.execute(req.body);
-
-		return response.created(res, "User created", id);
-	}
 
 	async loginUser(req: Request, res: Response) {
 		const authResult = await this.authenticateUserUsecase.execute(req.body);
@@ -51,6 +43,12 @@ export class AuthController {
 		this.clearRefreshCookie(res);
 
 		return response.success(res, "Logout successful!");
+	}
+
+	async getCurrentUser(req: Request, res: Response) {
+		const user = req.user;
+		
+		return response.success(res, "Current user.", { user });
 	}
 
 	private attachRefreshCookie(res: Response, refreshToken: string) {
