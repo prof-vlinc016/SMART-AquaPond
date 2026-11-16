@@ -8,22 +8,22 @@ import { MySqlRefreshTokenRepository } from "./repositories/MysqlRefreshTokenRep
 import { AuthRouter } from "./routes/AuthRouter.js";
 import { RefreshTokenService } from "./services/RefreshTokenService.js";
 import { AuthenticateUserUsecase } from "./usecases/AuthenticateUserUsecase.js";
-import { CreateUserUsecase } from "./usecases/CreateUserUsecase.js";
 import { RefreshSessionUsecase } from "./usecases/RefreshSessionUsecase.js";
 import { RevokeSessionUsecase } from "./usecases/RevokeSessionUsecase.js";
-import { TokenVerifier } from "../../core/contracts/token-verifier.js";
 import { Pool } from "mysql2/promise";
 import { DatabaseConnection } from "../../core/database/contracts/database-connection.js";
 import { TokenIssuer } from "../../core/contracts/token-issuer.js";
+import { RegisterIdentityUsecase } from "./usecases/RegisterIdentityUsecase.js";
+import { TokenVerifier } from "../../core/contracts/token-verifier.js";
 
 export class AuthModule<TConnection extends Pool> {
 	private readonly router: Router;
-	private readonly tokenVerifier: TokenVerifier;
+	private readonly registerIdentityUsecase: RegisterIdentityUsecase;
 
 	constructor(
 		database: DatabaseConnection<TConnection>,
-		tokenVerifier: TokenVerifier,
 		tokenIssuer: TokenIssuer,
+		tokenVerifier: TokenVerifier,
 	) {
 		const authUserRepository = new MySqlAuthUserRepository(
 			database.getPool(),
@@ -45,7 +45,7 @@ export class AuthModule<TConnection extends Pool> {
 			randomTokenGenerator,
 		);
 
-		const createUserUsecase = new CreateUserUsecase(
+		this.registerIdentityUsecase = new RegisterIdentityUsecase(
 			authUserRepository,
 			passwordHasher,
 		);
@@ -68,23 +68,21 @@ export class AuthModule<TConnection extends Pool> {
 		);
 
 		const authUserController = new AuthController(
-			createUserUsecase,
 			authenticateUserUsecase,
 			refreshSessionUsecase,
 			revokeSessionUsecase,
 		);
 
-		const authRouter = new AuthRouter(authUserController);
+		const authRouter = new AuthRouter(authUserController, tokenVerifier);
 
 		this.router = authRouter.getRouter();
-		this.tokenVerifier = tokenVerifier;
 	}
 
 	getRouter(): Router {
 		return this.router;
 	}
 
-	getTokenVerifier(): TokenVerifier {
-		return this.tokenVerifier;
+	getRegisterIdentityUsecase(): RegisterIdentityUsecase {
+		return this.registerIdentityUsecase;
 	}
 }
