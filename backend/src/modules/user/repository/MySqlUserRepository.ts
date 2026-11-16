@@ -34,10 +34,10 @@ export class MysqlUserRepository implements UserRepository {
 
 	async findAll(appQuery: AppQuery): Promise<User[]> {
 		return executor(async () => {
-			const { sql, params } =
-				MySqlQueryNormalizer.normalizeQueryParam(appQuery);
+			const {sql, params} = MySqlQueryNormalizer.normalizeQueryParam(appQuery);
 
-				const ned = `
+			const [rows] = await this.db.execute(
+				`
                 SELECT
                     id,
                     first_name AS firstname,
@@ -47,15 +47,8 @@ export class MysqlUserRepository implements UserRepository {
                     role
                 FROM users
 				${sql}
-                `
-
-				console.log(ned);
-				console.log(params);
-				
-
-			const [rows] = await this.db.execute(
-				ned,
-				params,
+                `,
+				params
 			);
 
 			const users = rows as User[];
@@ -116,11 +109,11 @@ export class MysqlUserRepository implements UserRepository {
 					COUNT(id) AS count 
 				FROM users;
                 `,
-			);
+			) ;
 
 			const userCounts = rows as { count: number }[];
 
-			return userCounts[0] ? userCounts[0].count : 0;
+			return userCounts[0] ? userCounts[0].count : 0; 
 		});
 	}
 }
