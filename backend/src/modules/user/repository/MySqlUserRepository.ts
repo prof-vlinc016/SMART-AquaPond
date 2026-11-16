@@ -2,6 +2,8 @@ import { Pool } from "mysql2/promise";
 import { UserRepository } from "../contracts/user-repository.js";
 import { User } from "../entities/User.js";
 import { executor } from "../../../infrastructure/database/mysql/mysql-executor.js";
+import { AppQuery } from "../../../core/types/app-query.js";
+import { MySqlQueryNormalizer } from "../../../infrastructure/database/mysql/MySqlQueryNormalizer.js";
 
 export class MysqlUserRepository implements UserRepository {
 	constructor(private readonly db: Pool) {}
@@ -30,10 +32,12 @@ export class MysqlUserRepository implements UserRepository {
 		});
 	}
 
-	async findAll(): Promise<User[]> {
+	async findAll(appQuery: AppQuery): Promise<User[]> {
 		return executor(async () => {
-			const [rows] = await this.db.execute(
-				`
+			const { sql, params } =
+				MySqlQueryNormalizer.normalizeQueryParam(appQuery);
+
+				const ned = `
                 SELECT
                     id,
                     first_name AS firstname,
@@ -42,7 +46,16 @@ export class MysqlUserRepository implements UserRepository {
                     email,
                     role
                 FROM users
-                `,
+				${sql}
+                `
+
+				console.log(ned);
+				console.log(params);
+				
+
+			const [rows] = await this.db.execute(
+				ned,
+				params,
 			);
 
 			const users = rows as User[];
@@ -92,6 +105,22 @@ export class MysqlUserRepository implements UserRepository {
 					user.id,
 				],
 			);
+		});
+	}
+
+	async getTotalUsers(): Promise<number> {
+		return executor(async () => {
+			const [rows] = await this.db.execute(
+				`
+                SELECT 
+					COUNT(id) AS count 
+				FROM users;
+                `,
+			);
+
+			const userCounts = rows as { count: number }[];
+
+			return userCounts[0] ? userCounts[0].count : 0;
 		});
 	}
 }
