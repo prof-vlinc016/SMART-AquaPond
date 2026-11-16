@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { TokenVerifier } from "../../contracts/token-verifier.js";
 import { UnAuthorizedError } from "../../errors/UnAuthorizedError.js";
 
-export function createAuthMiddleware(tokenVerifier: TokenVerifier) {
+export function requireAuth(tokenVerifier: TokenVerifier) {
 	return (req: Request, res: Response, next: NextFunction) => {
         try {
             const authHeader = req.headers.authorization;
