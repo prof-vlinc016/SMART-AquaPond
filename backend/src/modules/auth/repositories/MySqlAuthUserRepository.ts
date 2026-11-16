@@ -1,7 +1,8 @@
-import { Pool, ResultSetHeader } from "mysql2/promise";
+import { Pool, PoolConnection, ResultSetHeader } from "mysql2/promise";
 import { IAuthUserRepository } from "../contracts/auth-user-repository.js";
 import { AuthUser } from "../entities/AuthUser.js";
 import { executor } from "../../../infrastructure/database/mysql/mysql-executor.js";
+import { MySqlTransactionContext } from "../../../infrastructure/database/mysql/MySqlTransactionContext.js";
 
 export class MySqlAuthUserRepository implements IAuthUserRepository {
 	constructor(private readonly db: Pool) {}
@@ -26,7 +27,7 @@ export class MySqlAuthUserRepository implements IAuthUserRepository {
 
 			const authUsers = rows as AuthUser[];
 
-			return authUsers[0] ? AuthUser.reconstitute(authUsers[0]): null;
+			return authUsers[0] ? AuthUser.reconstitute(authUsers[0]) : null;
 		});
 	}
 
@@ -50,13 +51,16 @@ export class MySqlAuthUserRepository implements IAuthUserRepository {
 
 			const authUsers = rows as AuthUser[];
 
-			return authUsers[0] ? AuthUser.reconstitute(authUsers[0]): null;
+			return authUsers[0] ? AuthUser.reconstitute(authUsers[0]) : null;
 		});
 	}
 
-	async create(authUser: AuthUser): Promise<number> {
+	async create(
+		authUser: AuthUser,
+		context: MySqlTransactionContext,
+	): Promise<number> {
 		return executor(async () => {
-			const [result] = await this.db.execute(
+			const [result] = await context.connection.execute(
 				`
                 INSERT INTO users(
                     first_name,
