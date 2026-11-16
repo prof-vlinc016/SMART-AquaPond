@@ -24,6 +24,8 @@ export function createApp(dependencies: AppDependency) {
 					return callback(null, true);
 				}
 
+				console.log(origin);
+
 				return callback(new AppError("Origin not allowed by CORS"));
 			},
 			credentials: true,
@@ -32,6 +34,7 @@ export function createApp(dependencies: AppDependency) {
 
 	app.use(morgan("dev"));
 	app.use(express.json({ limit: "5mb" }));
+	app.use(express.urlencoded({ extended: true }));
 	app.use(cookieParser());
 
 	// Health check
@@ -42,7 +45,15 @@ export function createApp(dependencies: AppDependency) {
 		});
 	});
 
+	app.use("/api/uploads", express.static("uploads"));
 	app.use("/api", dependencies.appRouter);
+
+	app.post("/api/esp32/readings", (req, res) => {
+		console.log("ESP32 reading:", req.body);
+
+		res.sendStatus(204);
+	});
+
 	app.use(notFoundHandler);
 	app.use(errorHandler);
 

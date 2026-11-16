@@ -7,13 +7,17 @@ import { PresenceManager } from "../src/core/contracts/presence-manager.js";
 import { SocketIoUserNotifier } from "../src/infrastructure/websocket/notifier/SocketIoUserNotifier.js";
 import { AuthModule } from "../src/modules/auth/AuthModule.js";
 import { UserModule } from "../src/modules/user/UserModule.js";
+import { TransactionManager } from "../src/core/database/contracts/transaction-manager.js";
+import { ImageStorage } from "../src/core/contracts/image-storage.js";
 
 interface ModulesDependencies {
 	database: DatabaseConnection<Pool>;
+	transactionManager: TransactionManager;
 	tokenVerifier: TokenVerifier;
 	tokenIssuer: TokenIssuer;
 	presenceManager: PresenceManager;
 	io: SocketIOServer;
+	imageStorage: ImageStorage
 }
 
 export function createModules(dependencies: ModulesDependencies) {
@@ -24,14 +28,21 @@ export function createModules(dependencies: ModulesDependencies) {
 
 	const authModule = new AuthModule(
 		dependencies.database,
-		dependencies.tokenVerifier,
 		dependencies.tokenIssuer,
+		dependencies.tokenVerifier
 	);
 
-	const userModule = new UserModule(dependencies.database, userNotifer);
+	const userModule = new UserModule(
+		dependencies.database,
+		dependencies.transactionManager,
+		authModule.getRegisterIdentityUsecase(),
+		dependencies.imageStorage,
+		dependencies.tokenVerifier,
+		userNotifer,
+	);
 
-    return {
-        authModule,
-        userModule
-    }
+	return {
+		authModule,
+		userModule,
+	};
 }

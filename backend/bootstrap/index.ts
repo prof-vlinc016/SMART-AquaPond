@@ -33,9 +33,11 @@ const socketServer = createSocketServer({
 
 const modules = createModules({
 	database: container.database,
+	transactionManager: container.transactionManager,
 	tokenIssuer: container.jwtService,
 	tokenVerifier: container.jwtService,
 	presenceManager: container.presenceManager,
+	imageStorage: container.imageStorage,
 	io: socketServer,
 });
 

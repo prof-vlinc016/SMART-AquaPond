@@ -27,7 +27,7 @@ export class Server {
 	}
 
 	start() {
-		this.httpServer.listen(this.config.port, () => {
+		this.httpServer.listen(this.config.port, "0.0.0.0", () => {
 			console.log(
 				`${this.config.name} running on port ${this.config.port}`,
 			);
