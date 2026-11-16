@@ -12,11 +12,12 @@ export class MysqlUserRepository implements UserRepository {
 				`
                 SELECT
                     id,
-                    first_name as firstname,
-                    last_name as lastname,
+                    first_name AS firstname,
+                    last_name AS lastname,
                     username,
                     email,
-                    role
+                    role,
+					profile_image AS profileImage
                 FROM users
                 WHERE id = ?
                 `,
@@ -35,8 +36,8 @@ export class MysqlUserRepository implements UserRepository {
 				`
                 SELECT
                     id,
-                    first_name as firstname,
-                    last_name as lastname,
+                    first_name AS firstname,
+                    last_name AS lastname,
                     username,
                     email,
                     role
@@ -50,6 +51,23 @@ export class MysqlUserRepository implements UserRepository {
 		});
 	}
 
+	async insertProfileImage(
+		userId: number,
+		profileImage: string,
+	): Promise<void> {
+		return executor(async () => {
+			await this.db.execute(
+				`
+				INSERT INTO users(
+					profile_image
+				) VALUES (?)
+				WHERE id = ?
+				`,
+				[userId, profileImage],
+			);
+		});
+	}
+
 	async update(user: User): Promise<void> {
 		return executor(async () => {
 			await this.db.execute(
@@ -60,7 +78,8 @@ export class MysqlUserRepository implements UserRepository {
                     last_name = ?,
                     username = ?,
                     email = ?,
-                    role = ?
+                    role = ?,
+					profile_image = ?
                 WHERE id = ?
                 `,
 				[
@@ -69,6 +88,7 @@ export class MysqlUserRepository implements UserRepository {
 					user.username,
 					user.email,
 					user.role,
+					user.profileImage,
 					user.id,
 				],
 			);

@@ -6,6 +6,7 @@ export class User {
 		public username: string,
 		public email: string,
 		public role: string,
+		public profileImage: string | null,
 	) {}
 
 	static reconstitute(data: {
@@ -15,6 +16,7 @@ export class User {
 		username: string;
 		email: string;
 		role: string;
+		profileImage: string | null;
 	}): User {
 		return new User(
 			data.id,
@@ -23,17 +25,20 @@ export class User {
 			data.username,
 			data.email,
 			data.role,
+			data.profileImage,
 		);
 	}
 
 	updateProfile(data: {
-		firstname: string;
-		lastname: string;
-		username: string;
+		firstname?: string;
+		lastname?: string;
+		username?: string;
+		profileImage?: string;
 	}): void {
-		this.firstname = data.firstname;
-		this.lastname = data.lastname;
-		this.username = data.username;
+		this.firstname = data.firstname ?? this.firstname;
+		this.lastname = data.lastname ?? this.lastname;
+		this.username = data.username ?? this.username;
+		this.profileImage = data.profileImage ?? this.profileImage;
 	}
 
 	assignRole(role: string): void {
