@@ -2,6 +2,8 @@ import path from "path";
 import { ImageStorage } from "../../../core/contracts/image-storage.js";
 import { ValidationError } from "../../../core/errors/ValidationError.js";
 import { ImageFile } from "../../../core/types/image-file.js";
+import fs from "node:fs/promises";
+import { NotFoundError } from "../../../core/errors/NotFoundError.js";
 
 export class ImageService implements ImageStorage {
 	async upload(file: ImageFile, directory: string): Promise<string> {
@@ -21,14 +23,34 @@ export class ImageService implements ImageStorage {
 			throw new ValidationError("Image Validation failed", errors);
 		}
 
-		const uploadDir = path.join(`/uploads`, directory);
+		const uploadDir = path.join(`./uploads`, directory);
 
-        const extension = path.extname(file.originalName);
-        const fileName = `${crypto.randomUUID()}${extension}`;
-        const filepath = path.join(uploadDir, fileName);
+		await fs.mkdir(uploadDir, { recursive: true });
+
+		const extension = path.extname(file.originalname);
+		const fileName = `${crypto.randomUUID()}${extension}`;
+		const filepath = path.join(uploadDir, fileName);
+
+		await fs.writeFile(filepath, file.buffer);
 
 		return filepath;
 	}
 
-	async delete(filepath: string): Promise<void> {}
+	async delete(filepath: string): Promise<void> {
+		try {
+			await fs.access(filepath);
+
+			await fs.unlink(filepath);
+		} catch (error: unknown) {
+			if (
+				error instanceof Error &&
+				"code" in error &&
+				error.code === "ENOENT"
+			) {
+				throw new NotFoundError("Image not found!");
+			}
+
+			throw error;
+		}
+	}
 }
