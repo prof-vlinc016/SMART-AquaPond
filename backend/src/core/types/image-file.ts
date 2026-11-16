@@ -1,6 +1,6 @@
 export interface ImageFile {
     buffer: Buffer;
     mimetype: string;
-    originalName: string;
+    originalname: string;
     size: number;
 }
