@@ -1,4 +1,4 @@
-export interface AppQuery {
+export interface ListQuery {
 	search: { [key: string]: string[] } | null;
 	sort: string | null;
 	order: string | "ASC" | "DESC";
