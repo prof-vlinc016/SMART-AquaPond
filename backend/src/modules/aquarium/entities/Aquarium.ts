@@ -1,10 +1,10 @@
 export class Aquarium {
 	private constructor(
 		public readonly id: number,
-		public readonly name: string,
-		public readonly description: string,
-		public readonly location: string,
-		public readonly status: "ACTIVE" | "INACTIVE" | "MAINTENANCE" | string,
+		public name: string,
+		public description: string,
+		public location: string,
+		public status: "ACTIVE" | "INACTIVE" | "MAINTENANCE" | string,
 		public readonly createdAt?: string,
 		public readonly updatedAt?: string,
 	) {}
@@ -41,5 +41,11 @@ export class Aquarium {
 			data.createdAt,
 			data.updatedAt,
 		);
+	}
+
+	update(data: { name: string; description: string; location: string }) {
+		this.name = data.name;
+		this.description = data.description;
+		this.location = data.location;
 	}
 }
