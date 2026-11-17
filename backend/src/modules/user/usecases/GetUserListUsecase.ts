@@ -8,18 +8,16 @@ export class GetUserListUsecase {
 		private readonly userNotifier: UserNotifier, // Unused for now
 	) {}
 
-	async execute(UserQueryInput: UserQueryInput) {
-		const userList = await this.userRepository.findAll(UserQueryInput);
-		userList;
-
+	async execute(userQueryInput: UserQueryInput) {
+		const userList = await this.userRepository.findAll(userQueryInput);
 		const totalUser = await this.userRepository.getTotalUsers();
-		const totalPages = Math.ceil(totalUser / UserQueryInput.limit);
+		const totalPages = Math.ceil(totalUser / userQueryInput.limit);
 
 		return {
 			items: userList,
 			totalItems: totalUser,
 			totalPages: totalPages,
-			hasMore: UserQueryInput.page < totalPages,
+			hasMore: userQueryInput.page < totalPages,
 		};
 	}
 }
