@@ -44,8 +44,8 @@ export class Aquarium {
 	}
 
 	update(data: { name: string; description: string; location: string }) {
-		this.name = data.name;
-		this.description = data.description;
-		this.location = data.location;
+		this.name = data.name ?? this.name;
+		this.description = data.description ?? this.description;
+		this.location = data.location ?? this.location;
 	}
 }
