@@ -1,5 +1,5 @@
-import { AppQuery } from "../../../core/types/app-query.js";
+import { ListQuery } from "../../../core/types/list-query.js";
 
-export interface UserQueryInput extends AppQuery {
+export type UserQueryInput = ListQuery & {
 
 }

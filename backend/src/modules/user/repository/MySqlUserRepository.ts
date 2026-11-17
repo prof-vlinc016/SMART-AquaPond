@@ -2,7 +2,7 @@ import { Pool } from "mysql2/promise";
 import { UserRepository } from "../contracts/user-repository.js";
 import { User } from "../entities/User.js";
 import { executor } from "../../../infrastructure/database/mysql/mysql-executor.js";
-import { AppQuery } from "../../../core/types/app-query.js";
+import { ListQuery } from "../../../core/types/list-query.js";
 import { MySqlQueryNormalizer } from "../../../infrastructure/database/mysql/MySqlQueryNormalizer.js";
 
 export class MysqlUserRepository implements UserRepository {
@@ -32,9 +32,9 @@ export class MysqlUserRepository implements UserRepository {
 		});
 	}
 
-	async findAll(appQuery: AppQuery): Promise<User[]> {
+	async findAll(ListQuery: ListQuery): Promise<User[]> {
 		return executor(async () => {
-			const {sql, params} = MySqlQueryNormalizer.normalizeQueryParam(appQuery);
+			const {sql, params} = MySqlQueryNormalizer.normalizeQueryParam(ListQuery);
 
 			const [rows] = await this.db.execute(
 				`

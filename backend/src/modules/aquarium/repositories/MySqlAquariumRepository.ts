@@ -1,5 +1,5 @@
 import { Pool } from "mysql2/promise";
-import { AppQuery } from "../../../core/types/app-query.js";
+import { ListQuery } from "../../../core/types/list-query.js";
 import { AquariumRepository } from "../contracts/aquarium-repository.js";
 import { Aquarium } from "../entities/Aquarium.js";
 import { executor } from "../../../infrastructure/database/mysql/mysql-executor.js";
@@ -32,10 +32,10 @@ export class MySqlAquariumRepository implements AquariumRepository {
 		});
 	}
 
-	findAll(appQuery: AppQuery): Promise<Aquarium[]> {
+	findAll(ListQuery: ListQuery): Promise<Aquarium[]> {
 		return executor(async () => {
 			const { sql, params } =
-				MySqlQueryNormalizer.normalizeQueryParam(appQuery);
+				MySqlQueryNormalizer.normalizeQueryParam(ListQuery);
 
 			const [rows] = await this.db.execute(
 				`

@@ -1,13 +1,13 @@
-import { AppQuery } from "../../../core/types/app-query.js";
+import { ListQuery } from "../../../core/types/list-query.js";
 
 export class MySqlQueryNormalizer {
 	constructor() {}
 
-	static normalizeQueryParam(query: AppQuery) {
+	static normalizeQueryParam(query: ListQuery) {
 		const conditions: string[] = [];
 		const params: any[] = [];
 
-		const ignoredProperty: (keyof AppQuery)[] = [
+		const ignoredProperty: (keyof ListQuery)[] = [
 			"search",
 			"sort",
 			"order",
@@ -18,11 +18,11 @@ export class MySqlQueryNormalizer {
 		let sql: string = "";
 
 		for (const key in query) {
-			if (ignoredProperty.includes(key as keyof AppQuery)) {
+			if (ignoredProperty.includes(key as keyof ListQuery)) {
 				continue;
 			}
 
-			const value = query[key as keyof AppQuery];
+			const value = query[key as keyof ListQuery];
 
 			if (Array.isArray(value)) {
 				const { sql: inSql, params: inParams } = this.buildInClause(
@@ -91,7 +91,7 @@ export class MySqlQueryNormalizer {
 		};
 	}
 
-	private static buildSearchSql(search: AppQuery["search"]) {
+	private static buildSearchSql(search: ListQuery["search"]) {
 		const conditions: string[] = [];
 		const params: any[] = [];
 
